@@ -1,0 +1,450 @@
+apiVersion: application.kubero.dev/v1alpha1
+kind: KuberoApp
+metadata:
+  creationTimestamp: "2023-02-06T16:11:36Z"
+  finalizers:
+  - helm.sdk.operatorframework.io/uninstall-release
+  generation: 2
+  labels:
+    manager: kubero
+  name: opencart
+  namespace: test-production
+  resourceVersion: "5374938"
+  uid: e0d6d4d0-856c-468b-944a-722d15133a0f
+spec:
+  addons:
+  - displayName: Kubero Mysql
+    env: []
+    icon: /img/addons/MySQL.png
+    id: kubero-operator
+    kind: KuberoMysql
+    resourceDefinitions:
+      KuberoMysql:
+        apiVersion: application.kubero.dev/v1alpha1
+        kind: KuberoMysql
+        metadata:
+          name: opencart-mysql
+        spec:
+          mysql:
+            auth:
+              createDatabase: true
+              database: opencart
+              password: opencart
+              rootPassword: opencart
+              username: opencart
+            global:
+              storageClass: standard
+            primary:
+              persistence:
+                accessModes:
+                - ReadWriteOnce
+                size: 1Gi
+    version:
+      installed: 0.0.99
+      latest: 0.0.99
+  affinity: {}
+  autodeploy: true
+  autoscale: false
+  autoscaling:
+    enabled: false
+  branch: main
+  cronjobs: []
+  deploymentstrategy: docker
+  domain: opencart.lacolhost.com
+  envVars:
+  - name: OPENCART_PASSWORD
+    value: my_password
+  - name: MYSQL_CLIENT_DATABASE_HOST
+    value: opencart-mysql
+  - name: MYSQL_CLIENT_DATABASE_ROOT_USER
+    value: root
+  - name: MYSQL_CLIENT_DATABASE_ROOT_PASSWORD
+    value: opencart
+  - name: MYSQL_CLIENT_FLAVOR
+    value: mysql
+  - name: OPENCART_DATABASE_USER
+    value: opencart
+  - name: OPENCART_DATABASE_PASSWORD
+    value: opencart
+  - name: OPENCART_DATABASE_NAME
+    value: opencart
+  extraVolumes:
+  - accessModes:
+    - ReadWriteOnce
+    emptyDir: false
+    mountPath: /bitnami
+    name: opencart-volume
+    size: 1Gi
+    storageClass: standard
+  fullnameOverride: ""
+  gitrepo:
+    admin: true
+    clone_url: https://github.com/kubero-dev/template-nodeapp.git
+    default_branch: main
+    description: Simple example Node app
+    homepage: ""
+    id: 501665730
+    language: JavaScript
+    name: template-nodeapp
+    node_id: R_kgDOHebPwg
+    owner: kubero-dev
+    private: false
+    push: true
+    ssh_url: git@github.com:kubero-dev/template-nodeapp.git
+    visibility: public
+  image:
+    build:
+      command: npm install
+      repository: node
+      tag: latest
+    containerPort: 8080
+    fetch:
+      repository: ghcr.io/kubero-dev/buildpacks/fetch
+      tag: main
+    pullPolicy: Always
+    repository: bitnami/opencart
+    run:
+      command: node index.js
+      repository: node
+      tag: latest
+    tag: latest
+  imagePullSecrets: []
+  ingress:
+    annotations: {}
+    className: ""
+    enabled: true
+    hosts:
+    - host: opencart.lacolhost.com
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+    tls: []
+  name: opencart
+  nameOverride: ""
+  nodeSelector: {}
+  phase: production
+  pipeline: test
+  podAnnotations: {}
+  podSecurityContext: {}
+  podsize:
+    default: true
+    description: 'Small (CPU: 0.25, Memory: 0.5Gi)'
+    name: small
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 0.5Gi
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 0.5Gi
+  service:
+    port: 80
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    create: true
+    name: ""
+  tolerations: []
+  web:
+    autoscaling:
+      maxReplicas: 3
+      minReplicas: 1
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
+    replicaCount: 1
+  worker:
+    autoscaling:
+      maxReplicas: 0
+      minReplicas: 0
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
+    replicaCount: 0
+status:
+  conditions:
+  - lastTransitionTime: "2023-02-06T16:11:36Z"
+    status: "True"
+    type: Initialized
+  - lastTransitionTime: "2023-02-06T16:11:37Z"
+    message: |
+      1. Get the application URL by running these commands:
+        http://opencart.lacolhost.com/
+    reason: UpgradeSuccessful
+    status: "True"
+    type: Deployed
+  deployedRelease:
+    manifest: |
+      ---
+      # Source: kuberoapp/templates/serviceaccount.yaml
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: opencart-kuberoapp
+        labels:
+          helm.sh/chart: kuberoapp-0.1.0
+          app.kubernetes.io/name: kuberoapp
+          app.kubernetes.io/instance: opencart
+          app.kubernetes.io/version: "1.16.0"
+          app.kubernetes.io/managed-by: Helm
+      ---
+      # Source: kuberoapp/templates/pvc.yaml
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: opencart-volume
+      spec:
+        storageClassName: standard
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+      ---
+      # Source: kuberoapp/templates/service.yaml
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: opencart-kuberoapp
+        labels:
+          helm.sh/chart: kuberoapp-0.1.0
+          app.kubernetes.io/name: kuberoapp
+          app.kubernetes.io/instance: opencart
+          app.kubernetes.io/version: "1.16.0"
+          app.kubernetes.io/managed-by: Helm
+      spec:
+        type: ClusterIP
+        ports:
+          - port: 80
+            targetPort: http
+            protocol: TCP
+            name: http
+        selector:
+          app.kubernetes.io/name: kuberoapp
+          app.kubernetes.io/instance: opencart-web
+      ---
+      # Source: kuberoapp/templates/deployment-web.yaml
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: opencart-kuberoapp-web
+        labels:
+          helm.sh/chart: kuberoapp-0.1.0
+          app.kubernetes.io/name: kuberoapp
+          app.kubernetes.io/instance: opencart
+          app.kubernetes.io/version: "1.16.0"
+          app.kubernetes.io/managed-by: Helm
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: kuberoapp
+            app.kubernetes.io/instance: opencart-web
+        template:
+          metadata:
+            labels:
+              app.kubernetes.io/name: kuberoapp
+              app.kubernetes.io/instance: opencart-web
+          spec:
+            serviceAccountName: opencart-kuberoapp
+            securityContext:
+              {}
+            containers:
+              - name: kuberoapp-web
+                securityContext:
+                  readOnlyRootFilesystem: true
+                image: "bitnami/opencart:latest"
+                imagePullPolicy: Always
+                env:
+                  - name: PROC_TYPE
+                    value: web
+                  - name: PORT
+                    value: "8080"
+                  - name: OPENCART_PASSWORD
+                    value: "my_password"
+                  - name: MYSQL_CLIENT_DATABASE_HOST
+                    value: "opencart-mysql"
+                  - name: MYSQL_CLIENT_DATABASE_ROOT_USER
+                    value: "root"
+                  - name: MYSQL_CLIENT_DATABASE_ROOT_PASSWORD
+                    value: "opencart"
+                  - name: MYSQL_CLIENT_FLAVOR
+                    value: "mysql"
+                  - name: OPENCART_DATABASE_USER
+                    value: "opencart"
+                  - name: OPENCART_DATABASE_PASSWORD
+                    value: "opencart"
+                  - name: OPENCART_DATABASE_NAME
+                    value: "opencart"
+                ports:
+                  - name: http
+                    containerPort: 8080
+                    protocol: TCP
+                livenessProbe:
+                  httpGet:
+                    path: /
+                    port: http
+                readinessProbe:
+                  httpGet:
+                    path: /
+                    port: http
+                volumeMounts:
+                  - mountPath: /tmp
+                    name: tmp-storage
+                    readOnly: false
+                  - mountPath: /bitnami
+                    name: opencart-volume
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 1Gi
+                  requests:
+                    cpu: 250m
+                    memory: 0.5Gi
+            volumes:
+            - name: deployment-keys
+              secret:
+                defaultMode: 0600
+                secretName: deployment-keys
+            - name: app-storage
+              emptyDir: {}
+            - name: tmp-storage
+              emptyDir: {}
+            - name: opencart-volume
+              persistentVolumeClaim:
+                claimName: opencart-volume
+      ---
+      # Source: kuberoapp/templates/deployment-worker.yaml
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: opencart-kuberoapp-worker
+        labels:
+          helm.sh/chart: kuberoapp-0.1.0
+          app.kubernetes.io/name: kuberoapp
+          app.kubernetes.io/instance: opencart
+          app.kubernetes.io/version: "1.16.0"
+          app.kubernetes.io/managed-by: Helm
+      spec:
+        replicas: 0
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: kuberoapp
+            app.kubernetes.io/instance: opencart-worker
+        template:
+          metadata:
+            labels:
+              app.kubernetes.io/name: kuberoapp
+              app.kubernetes.io/instance: opencart-worker
+          spec:
+            serviceAccountName: opencart-kuberoapp
+            securityContext:
+              {}
+            containers:
+              - name: kuberoapp-worker
+                securityContext:
+                  readOnlyRootFilesystem: true
+                image: "bitnami/opencart:latest"
+                imagePullPolicy: Always
+                env:
+                  - name: PROC_TYPE
+                    value: worker
+                  - name: PORT
+                    value: "8080"
+                  - name: OPENCART_PASSWORD
+                    value: "my_password"
+                  - name: MYSQL_CLIENT_DATABASE_HOST
+                    value: "opencart-mysql"
+                  - name: MYSQL_CLIENT_DATABASE_ROOT_USER
+                    value: "root"
+                  - name: MYSQL_CLIENT_DATABASE_ROOT_PASSWORD
+                    value: "opencart"
+                  - name: MYSQL_CLIENT_FLAVOR
+                    value: "mysql"
+                  - name: OPENCART_DATABASE_USER
+                    value: "opencart"
+                  - name: OPENCART_DATABASE_PASSWORD
+                    value: "opencart"
+                  - name: OPENCART_DATABASE_NAME
+                    value: "opencart"
+                ports:
+                  - name: http
+                    containerPort: 8080
+                    protocol: TCP
+                volumeMounts:
+                  - mountPath: /tmp
+                    name: tmp-storage
+                    readOnly: false
+                  - mountPath: /bitnami
+                    name: opencart-volume
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 1Gi
+                  requests:
+                    cpu: 250m
+                    memory: 0.5Gi
+            volumes:
+            - name: deployment-keys
+              secret:
+                defaultMode: 0600
+                secretName: deployment-keys
+            - name: app-storage
+              emptyDir: {}
+            - name: tmp-storage
+              emptyDir: {}
+            - name: opencart-volume
+              persistentVolumeClaim:
+                claimName: opencart-volume
+      ---
+      # Source: kuberoapp/templates/ingress.yaml
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: opencart-kuberoapp
+        labels:
+          helm.sh/chart: kuberoapp-0.1.0
+          app.kubernetes.io/name: kuberoapp
+          app.kubernetes.io/instance: opencart
+          app.kubernetes.io/version: "1.16.0"
+          app.kubernetes.io/managed-by: Helm
+      spec:
+        rules:
+          - host: "opencart.lacolhost.com"
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: opencart-kuberoapp
+                      port:
+                        number: 80
+      ---
+      # Source: kuberoapp/templates/addons.yaml
+      apiVersion: application.kubero.dev/v1alpha1
+      kind: KuberoMysql
+      metadata:
+        name: opencart-mysql
+      spec:
+        mysql:
+          auth:
+            createDatabase: true
+            database: opencart
+            password: opencart
+            rootPassword: opencart
+            username: opencart
+          global:
+            storageClass: standard
+          primary:
+            persistence:
+              accessModes:
+              - ReadWriteOnce
+              size: 1Gi
+    name: opencart
