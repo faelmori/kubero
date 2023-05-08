@@ -1,0 +1,81 @@
+apiVersion: application.kubero.dev/v1alpha1
+kind: KuberoApp
+metadata:
+  name: gatus
+spec:
+  name: gatus
+  deploymentstrategy: docker
+  image:
+    repository: twinproduction/gatus
+    tag: latest
+    containerPort: "8080"
+  addons: []
+  envVars:
+  - name: OVERWRITE_SETTINGS
+    value: "false"
+  - name: CHUNK_SIZE
+    value: "90"
+  - name: ROUTE_PREFIX
+    value: "/api"
+  - name: RATE_LIMIT_WINDOW
+    value: "2"
+  - name: RATE_LIMIT_MAX
+    value: "5"
+  - name: BLOCKED_EXTENSIONS
+    value: ".jar,.exe,.msi,.com,.bat,.cmd,.scr,.ps1,.sh"
+  - name: SECRET
+    value: ""
+  - name: MAX_LINKS_PER_ALBUM
+    value: "5"
+  - name: META_THEME_COLOR
+    value: "#20222b"
+  - name: META_DESCRIPTION
+    value: "Blazing fast file uploader and bunker written in node!"
+  - name: META_KEYWORDS
+    value: "chibisafe,upload,uploader,file,vue,images,ssr,file uploader,free"
+  - name: META_TWITTER_HANDLE
+    value: ""
+  - name: SERVER_PORT
+    value: "8080"
+  - name: DOMAIN
+    value: "http://localhost:8080"
+  - name: SERVICE_NAME
+    value: "chibisafe"
+  - name: MAX_SIZE
+    value: "5000"
+  - name: GENERATE_THUMBNAILS
+    value: "true"
+  - name: GENERATE_ZIPS
+    value: "true"
+  - name: STRIP_EXIF
+    value: "true"
+  - name: SERVE_WITH_NODE
+    value: "true"
+  - name: GENERATED_FILENAME_LENGTH
+    value: "6"
+  - name: GENERATED_ALBUM_LENGTH
+    value: "4"
+  - name: PUBLIC_MODE
+    value: "false"
+  - name: USER_ACCOUNTS
+    value: "true"
+  - name: ADMIN_ACCOUNT
+    value: ""
+  - name: ADMIN_PASSWORD
+    value: ""
+  - name: DB_CLIENT
+    value: "sqlite3"
+  - name: DB_HOST
+    value: ""
+  - name: DB_USER
+    value: ""
+  - name: DB_PASSWORD
+    value: ""
+  - name: DB_DATABASE
+    value: ""
+  cronjobs: []
+  extraVolumes: []
+  web:
+    replicaCount: 1
+  worker:
+    replicaCount: 0
